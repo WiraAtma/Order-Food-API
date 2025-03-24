@@ -19,6 +19,12 @@ class MenuDetailResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'image' => $this->image,
+            'comments' => $this->whenLoaded('comments', function () {
+                return collect($this->comments)->each(function ($comment) {
+                    $comment->user;
+                    return $comment;
+                });
+            }),
             'created_at' => date_format($this->created_at, 'Y-m-d'),
             'updated_at' => date_format($this->updated_at, 'Y-m-d'),
         ];

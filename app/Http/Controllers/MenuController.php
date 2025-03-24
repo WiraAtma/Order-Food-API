@@ -11,7 +11,7 @@ class MenuController extends Controller
 {
     public function index() {
         $menu = Menu::all();
-        return MenuDetailResource::collection($menu);
+        return MenuDetailResource::collection($menu->loadMissing('comments:id,user_id,menu_id,comment,created_at'));
     }
 
     public function store(Request $request) {
