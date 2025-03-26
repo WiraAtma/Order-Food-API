@@ -17,7 +17,9 @@ class MenuDetailResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'category' => $this->category,
             'description' => $this->description,
+            'price' => $this->price,
             'image' => $this->image,
             'comments' => $this->whenLoaded('comments', function () {
                 return collect($this->comments)->each(function ($comment) {
