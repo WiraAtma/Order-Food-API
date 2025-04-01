@@ -12,7 +12,7 @@ class Menu extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'name', 'description', 'price', 'image'
+        'name', 'description', 'price', 'image', 'category'
     ];
 
     /**
