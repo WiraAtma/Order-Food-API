@@ -23,11 +23,14 @@ class AuthenticationController extends Controller
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
-        return $user->createToken('user login')->plainTextToken;
+        return response()->json([
+            'token' => $user->createToken('user login')->plainTextToken,
+            'user' => $user
+        ]);
     }
 
     public function logout(Request $request) {
-        $request->user()->tokens()->delete();
+        $request->user()->currentAccessToken()->delete();
     }
 
     public function me(Request $request) {
