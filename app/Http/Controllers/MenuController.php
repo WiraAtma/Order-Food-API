@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\MenuDetailResource;
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
@@ -46,36 +47,34 @@ class MenuController extends Controller
 
     public function update(Request $request, $id) {
         $validated = $request->validate([
-            'name' => 'required|max:255|sometimes',
-            'description' => 'required|sometimes',
-            'price' => 'required|sometimes',
-            'category' => 'required|sometimes',
+            'name' => 'sometimes|max:255',
+            'description' => 'sometimes',
+            'price' => 'sometimes|numeric',
+            'category' => 'sometimes',
             'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif',
         ]);
-
+    
         $menu = Menu::findOrFail($id);
-
         $imageDefault = $menu->image;
-
-        if($request->file('image')) {
+    
+        if ($request->file('image')) {
             if ($menu->image) {
                 $oldImagePath = str_replace(asset('storage/'), '', $menu->image);
                 Storage::disk('public')->delete($oldImagePath);
             }
-        
+    
             $formatFile = $request->file('image')->getClientOriginalExtension();
             $imageDefault = now()->timestamp . "." . $formatFile;
             $request->file('image')->storeAs('image', $imageDefault, 'public');
             $imageDefault = asset('storage/image/' . $imageDefault);
         }
-
-        $menu->update([
-            'name' => $request->name,
-            'description' => $request->description,
-            'price' => $request->price,
-            'image' => $imageDefault,
-            'category' => $request->category
-        ]);
+    
+        $data = $request->all();
+        $data['image'] = $imageDefault;
+    
+        $menu->update($data);
+        Log::info('Updated menu data:', $menu->toArray());
+    
         return new MenuDetailResource($menu); 
     }
 
