@@ -10,8 +10,18 @@ use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
-    public function index() {
-        $menu = Menu::all();
+    public function index(Request $request) {
+
+        $category = $request->query('category');
+
+        $query = Menu::query();
+
+        if ($category) {
+            $query->where('category', $category);
+        }
+
+        $menu = $query->get();
+        
         return MenuDetailResource::collection(
             $menu->loadMissing('comments:id,user_id,menu_id,comment,created_at')
         );
