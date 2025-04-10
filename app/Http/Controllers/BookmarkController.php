@@ -28,7 +28,7 @@ class BookmarkController extends Controller
     }
 
     public function destroy($id) {
-        $bookmark = Bookmark::findOrFail($id);
+        $bookmark = Bookmark::where('menu_id', $id)->where('user_id', Auth::id())->first();
         $bookmark->delete();
         return new BookmarkResource($bookmark);
     }
