@@ -19,7 +19,6 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'order_id' => 'required|integer',
             'items' => 'required|array',
             'items.*.menu_id' => 'required|integer',
             'items.*.quantity' => 'required|integer|min:1',
@@ -27,7 +26,7 @@ class OrderController extends Controller
         ]);
     
         $userId = Auth::id();
-        $orderId = $request->order_id;
+        $orderId = random_int(1000000000, 9999999999);
     
         $itemsToInsert = collect($request->items)->map(function ($item) use ($userId, $orderId) {
             return [
