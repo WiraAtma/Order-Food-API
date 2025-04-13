@@ -17,14 +17,12 @@ class OrderDetailResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
-            'total_price' => $this->total_price,
+            'order_id' => $this->order_id,
+            'menu_id' => $this->menu_id,
+            'menu' => $this->whenLoaded('menu'),
+            'quantity' => $this->quantity,
+            'price' => $this->price,
             'status' => $this->status,
-            'order_items' => $this->whenLoaded('orderItem', function () {
-                return collect($this->orderItem)->each(function ($orderItem) {
-                    $orderItem->menu;
-                    return $orderItem;
-                });
-            }),
             'created_at' => date_format($this->created_at, 'Y-m-d'),
             'updated_at' => date_format($this->updated_at, 'Y-m-d'),
         ];

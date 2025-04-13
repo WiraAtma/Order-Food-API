@@ -10,21 +10,13 @@ class OrderItem extends Model
     protected $table = 'order_items';
 
     protected $fillable = [
+        'user_id',
         'order_id',
         'menu_id',
         'quantity',
         'price',
+        'status'
     ];
-
-    /**
-     * Get the order that owns the OrderItem
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function order(): BelongsTo
-    {
-        return $this->belongsTo(Order::class);
-    }
 
     /**
      * Get the menu that owns the OrderItem
