@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\OrderDetailResource;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
@@ -15,6 +16,7 @@ class OrderController extends Controller
     
         $orderItems = OrderItem::with('menu')
             ->where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
             ->get();
     
         $groupedOrders = $orderItems->groupBy('order_id')->map(function ($items, $orderId) {
@@ -22,8 +24,8 @@ class OrderController extends Controller
                 'order_id' => $orderId,
                 'user_id' => $items[0]->user_id,
                 'status' => $items[0]->status,
-                'created_at' => $items[0]->created_at,
-                'updated_at' => $items[0]->updated_at,
+                'created_at' => Carbon::parse($items[0]->created_at)->locale('id')->translatedFormat('d F Y H:i:s'),
+                'updated_at' => Carbon::parse($items[0]->updated_at)->locale('id')->translatedFormat('d F Y H:i:s'),
                 'items' => $items->map(function ($item) {
                     return [
                         'menu_id' => $item->menu_id,
