@@ -12,12 +12,18 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $userId = Auth::id();
+        $user = Auth::user();
     
-        $orderItems = OrderItem::with('menu')
-            ->where('user_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        if ($user->role === 'admin') {
+            $orderItems = OrderItem::with('menu')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } else {
+            $orderItems = OrderItem::with('menu')
+                ->where('user_id', $user->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
     
         $groupedOrders = $orderItems->groupBy('order_id')->map(function ($items, $orderId) {
             return [
