@@ -32,7 +32,7 @@ class MenuController extends Controller
             'name' => 'required|max:255',
             'description' => 'required',
             'price' => 'required|numeric',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'category' => 'required',
         ]);
 

@@ -23,6 +23,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'store']);
+    Route::patch('/orders/{order_id}/status', [OrderController::class, 'updateStatus']);
 
     Route::post('/comments', [CommentController::class, 'store']);
     Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->middleware(UserComment::class);

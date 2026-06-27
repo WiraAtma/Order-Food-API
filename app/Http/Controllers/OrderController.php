@@ -77,4 +77,24 @@ class OrderController extends Controller
         return response()->json(['message' => 'Order items saved successfully.']);
     }
 
+    public function updateStatus(Request $request, $order_id) {
+        $request->validate([
+            'status' => 'required|string',
+        ]);
+
+        $orderItems = OrderItem::where('order_id', $order_id)->get();
+
+        if ($orderItems->isEmpty()) {
+            return response()->json(['error' => 'Order not found'], 404);
+        }
+        
+        foreach ($orderItems as $item) {
+            $item->status = $request->status;
+            $item->save(); 
+        }
+
+        return response()->json(['message' => 'Status updated successfully']);
+    }
+
+
 }
