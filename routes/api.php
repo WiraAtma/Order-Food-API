@@ -32,3 +32,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::get('/menus', [MenuController::class, 'index']);
 
 Route::post('/login', [AuthenticationController::class, 'login']);
+
+Route::options('{any}', function () {
+    return response()->noContent()
+        ->header('Access-Control-Allow-Origin', 'http://localhost:5173')
+        ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+})->where('any', '.*');
