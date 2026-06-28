@@ -5,18 +5,33 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\HandleCors;
 
-if (isset($_ENV['VERCEL_JOB_ID']) || isset($_ENV['NOW_REGION'])) {
-    $_ENV['APP_BASE_PATH'] = dirname(__DIR__);
-    
-    $targetCacheDir = '/tmp/storage/bootstrap/cache';
-    if (!is_dir($targetCacheDir)) {
-        mkdir($targetCacheDir, 0755, true);
+$isVercel = isset($_ENV['VERCEL_JOB_ID']) || isset($_SERVER['VERCEL_URL']) || isset($_ENV['NOW_REGION']);
+
+if ($isVercel) {
+    $storagePath = '/tmp/storage';
+    $cachePath = '/tmp/storage/bootstrap/cache';
+
+    $directories = [
+        $cachePath,
+        "{$storagePath}/framework/views",
+        "{$storagePath}/framework/cache/data",
+        "{$storagePath}/framework/sessions",
+        "{$storagePath}/logs",
+    ];
+
+    foreach ($directories as $dir) {
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
     }
+
+    $_SERVER['VIEW_COMPILED_PATH'] = "{$storagePath}/framework/views";
+    $_ENV['VIEW_COMPILED_PATH'] = "{$storagePath}/framework/views";
     
-    putenv("APP_PACKAGES_CACHE={$targetCacheDir}/packages.php");
-    putenv("APP_SERVICES_CACHE={$targetCacheDir}/services.php");
-    putenv("APP_CONFIG_CACHE={$targetCacheDir}/config.php");
-    putenv("APP_ROUTES_CACHE={$targetCacheDir}/routes.php");
+    $_SERVER['APP_PACKAGES_CACHE'] = "{$cachePath}/packages.php";
+    $_SERVER['APP_SERVICES_CACHE'] = "{$cachePath}/services.php";
+    $_SERVER['APP_CONFIG_CACHE'] = "{$cachePath}/config.php";
+    $_SERVER['APP_ROUTES_CACHE'] = "{$cachePath}/routes.php";
 }
 
 $app = Application::configure(basePath: dirname(__DIR__))
@@ -35,8 +50,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
     })
     ->create();
 
-if (isset($_ENV['VERCEL_JOB_ID']) || isset($_ENV['NOW_REGION'])) {
+if ($isVercel) {
     $app->useStoragePath('/tmp/storage');
+    
+    $app->resolving('config', function ($config) {
+        $config->set('view.compiled', '/tmp/storage/framework/views');
+    });
 }
 
 return $app;
