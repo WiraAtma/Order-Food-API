@@ -28,69 +28,75 @@ class MenuController extends Controller
     }
 
     public function store(Request $request) {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|max:255',
             'description' => 'required',
             'price' => 'required|numeric',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
             'category' => 'required',
         ]);
 
-        $imageDefault = '';
-        if($request->file('image')) {
+
+        $imagePath = null;
+        if ($request->hasFile('image')) {
             $formatFile = $request->file('image')->getClientOriginalExtension();
-            $imageDefault = now()->timestamp . "." . $formatFile;
-            $request->file('image')->storeAs('image', $imageDefault, 'public');
-            $imageDefault = asset('storage/image/' . $imageDefault);
+            $fileName = now()->timestamp . '.' . $formatFile;
+            $imagePath = $request->file('image')
+                                 ->storeAs('menu-images', $fileName, 'supabase');
         }
-        
+
         $menu = Menu::create([
-            'name' => $request->name,
+            'name'        => $request->name,
             'description' => $request->description,
-            'price' => $request->price,
-            'image' => $imageDefault,
-            'category' => $request->category
+            'price'       => $request->price,
+            'image'       => $imagePath,
+            'category'    => $request->category,
         ]);
-        
+
         return new MenuDetailResource($menu);
     }
 
     public function update(Request $request, $id) {
-        $validated = $request->validate([
-            'name' => 'sometimes|max:255',
+        $request->validate([
+            'name'        => 'sometimes|max:255',
             'description' => 'sometimes',
-            'price' => 'sometimes|numeric',
-            'category' => 'sometimes',
-            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif',
+            'price'       => 'sometimes|numeric',
+            'category'    => 'sometimes',
+            'image'       => 'sometimes|image|mimes:jpeg,png,jpg,gif',
         ]);
-    
+
         $menu = Menu::findOrFail($id);
-        $imageDefault = $menu->image;
-    
-        if ($request->file('image')) {
-            if ($menu->image) {
-                $oldImagePath = str_replace(asset('storage/'), '', $menu->image);
-                Storage::disk('public')->delete($oldImagePath);
+        $imagePath = $menu->image;
+
+        if ($request->hasFile('image')) {
+            if ($imagePath) {
+                Storage::disk('supabase')->delete($imagePath);
             }
-    
+
             $formatFile = $request->file('image')->getClientOriginalExtension();
-            $imageDefault = now()->timestamp . "." . $formatFile;
-            $request->file('image')->storeAs('image', $imageDefault, 'public');
-            $imageDefault = asset('storage/image/' . $imageDefault);
+            $fileName = now()->timestamp . '.' . $formatFile;
+            $imagePath = $request->file('image')
+                                 ->storeAs('menu-images', $fileName, 'supabase');
         }
-    
-        $data = $request->all();
-        $data['image'] = $imageDefault;
-    
+
+        $data = $request->except('image');
+        $data['image'] = $imagePath;
+
         $menu->update($data);
         Log::info('Updated menu data:', $menu->toArray());
-    
-        return new MenuDetailResource($menu); 
+
+        return new MenuDetailResource($menu);
     }
 
     public function destroy($id) {
         $menu = Menu::findOrFail($id);
+
+        // Hapus gambar dari Supabase saat destroy
+        if ($menu->image) {
+            Storage::disk('supabase')->delete($menu->image);
+        }
+
         $menu->delete();
-        return new MenuDetailResource($menu); 
+        return new MenuDetailResource($menu);
     }
 }
