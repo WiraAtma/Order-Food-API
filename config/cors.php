@@ -1,7 +1,3 @@
-// Source - https://stackoverflow.com/a/78838359
-// Posted by Bloody Kheeng
-// Retrieved 2026-06-28, License - CC BY-SA 4.0
-
 <?php
 
 return [
