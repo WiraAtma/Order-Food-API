@@ -12,6 +12,11 @@ if (isset($_ENV['VERCEL_JOB_ID']) || isset($_ENV['NOW_REGION'])) {
     if (!is_dir($targetCacheDir)) {
         mkdir($targetCacheDir, 0755, true);
     }
+    
+    putenv("APP_PACKAGES_CACHE={$targetCacheDir}/packages.php");
+    putenv("APP_SERVICES_CACHE={$targetCacheDir}/services.php");
+    putenv("APP_CONFIG_CACHE={$targetCacheDir}/config.php");
+    putenv("APP_ROUTES_CACHE={$targetCacheDir}/routes.php");
 }
 
 $app = Application::configure(basePath: dirname(__DIR__))
@@ -32,7 +37,6 @@ $app = Application::configure(basePath: dirname(__DIR__))
 
 if (isset($_ENV['VERCEL_JOB_ID']) || isset($_ENV['NOW_REGION'])) {
     $app->useStoragePath('/tmp/storage');
-    $app->useBootstrapCachePath('/tmp/storage/bootstrap/cache');
 }
 
 return $app;
