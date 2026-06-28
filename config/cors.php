@@ -1,25 +1,40 @@
+// Source - https://stackoverflow.com/a/78838359
+// Posted by Bloody Kheeng
+// Retrieved 2026-06-28, License - CC BY-SA 4.0
+
 <?php
 
 return [
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    /*
+    |--------------------------------------------------------------------------
+    | Cross-Origin Resource Sharing (CORS) Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure your settings for cross-origin resource sharing
+    | or "CORS". This determines what cross-origin operations may execute
+    | in web browsers. You are free to adjust these settings as needed.
+    |
+    | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+    |
+     */
 
-    'allowed_methods' => ['*'],
+    'paths' => ['api/*', 'api/api/*', 'sanctum/csrf-cookie', '*'],
+    // 'paths' => ['*'],
 
-    'allowed_origins' => [
-        'http://localhost:5173',
-        'http://localhost:3000',
-        'http://127.0.0.1:5173',
-        'http://127.0.0.1:3000',
-    ],
+    'allowed_methods' => ['POST', 'GET', 'DELETE', 'PUT', '*'],
 
-    'allowed_origins_patterns' => [],
+    // 'allowed_origins' => ['*'],
+    'allowed_origins' => ['https://test.vercel.app/', 'https://aws-0-eu-test-superabase.com/', 'http://localhost:3000/', 'http://localhost:5432/', '*'],
 
-    'allowed_headers' => ['*'],
+    'allowed_origins_patterns' => ['*'],
+
+    'allowed_headers' => ['X-Custom-Header', 'Upgrade-Insecure-Requests', '*'],
 
     'exposed_headers' => [],
 
     'max_age' => 0,
 
     'supports_credentials' => false,
+
 ];

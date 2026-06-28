@@ -11,13 +11,8 @@
       "dest": "/public/build/$1"
     },
     {
-      "src": "/(.*)\\.(.*)",
-      "dest": "/public/$1.$2"
-    },
-    {
       "src": "/(.*)",
       "dest": "/api/index.php"
     }
-  ],
-  "outputDirectory": "public"
+  ]
 }
