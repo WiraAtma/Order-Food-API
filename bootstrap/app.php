@@ -22,6 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->registered(function ($app) {
         if (isset($_ENV['VERCEL_JOB_ID']) || isset($_ENV['NOW_REGION'])) {
             $app->useStoragePath('/tmp/storage');
+            
+            $app->useBootstrapCachePath('/tmp/storage/bootstrap/cache');
         }
     })
     ->create();
