@@ -5,7 +5,16 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\HandleCors;
 
-return Application::configure(basePath: dirname(__DIR__))
+if (isset($_ENV['VERCEL_JOB_ID']) || isset($_ENV['NOW_REGION'])) {
+    $_ENV['APP_BASE_PATH'] = dirname(__DIR__);
+    
+    $targetCacheDir = '/tmp/storage/bootstrap/cache';
+    if (!is_dir($targetCacheDir)) {
+        mkdir($targetCacheDir, 0755, true);
+    }
+}
+
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
@@ -19,11 +28,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })
-    ->registered(function ($app) {
-        if (isset($_ENV['VERCEL_JOB_ID']) || isset($_ENV['NOW_REGION'])) {
-            $app->useStoragePath('/tmp/storage');
-            
-            $app->useBootstrapCachePath('/tmp/storage/bootstrap/cache');
-        }
-    })
     ->create();
+
+if (isset($_ENV['VERCEL_JOB_ID']) || isset($_ENV['NOW_REGION'])) {
+    $app->useStoragePath('/tmp/storage');
+    $app->useBootstrapCachePath('/tmp/storage/bootstrap/cache');
+}
+
+return $app;
